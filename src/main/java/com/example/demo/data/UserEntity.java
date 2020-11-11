@@ -1,0 +1,71 @@
+package com.example.demo.data;
+
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.example.demo.boundary.Name;
+
+@Entity
+@Table(name = "USERS")
+public class UserEntity {
+	private String email;
+	private String password;
+	private Name name;
+	private String birthdate;
+	private String[] roles;
+	
+	public UserEntity(String email, String password, Name name, String birthdate, String[] roles) {
+		this.email = email;
+		this.password = password;
+		this.name = name;
+		this.birthdate = birthdate;
+		this.roles = roles;
+	}
+	
+	public UserEntity() {
+	}
+	
+	@Id
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	@Embedded
+	public Name getName() {
+		return name;
+	}
+
+	public void setName(Name name) {
+		this.name = name;
+	}
+
+	public String getBirthdate() {
+		return birthdate;
+	}
+
+	public void setBirthdate(String birthdate) {
+		this.birthdate = birthdate;
+	}
+
+	public String[] getRoles() {
+		return roles;
+	}
+
+	public void setRoles(String[] roles) {
+		this.roles = roles;
+	}
+}
