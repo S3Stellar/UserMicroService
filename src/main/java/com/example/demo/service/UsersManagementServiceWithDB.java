@@ -11,11 +11,20 @@ import com.example.demo.data.UserConverter;
 import com.example.demo.data.UserEntity;
 import com.example.demo.exceptions.IncorrectPasswordException;
 import com.example.demo.exceptions.UserNotFoundException;
+import com.example.demo.validation.Validator;
 
 @Service
 public class UsersManagementServiceWithDB implements UsersManagementService{
 	private UserDao userDao;
 	private UserConverter userConverter;
+	
+	
+	private Validator validator;
+	
+	@Autowired
+	public void setValidator(Validator validator) {
+		this.validator = validator;
+	}
 	
 	@Autowired
 	public void setUserConverter(UserConverter userConverter) {
@@ -29,6 +38,9 @@ public class UsersManagementServiceWithDB implements UsersManagementService{
 	
 	@Override
 	public UserBoundary create(UserBoundary user) {
+		if(!this.validator.validateUserPassword(user.getPassword())) {
+			throw new RuntimeException("Your password don't match to our criteria");
+		}
 		UserEntity userFromDB= this.userDao.save(this.userConverter.toEntity(user));
 		return this.userConverter.fromEntity(userFromDB);
 	}
@@ -53,6 +65,7 @@ public class UsersManagementServiceWithDB implements UsersManagementService{
 	public void updateUser(String email, UserBoundary user) {
 		UserBoundary userFromDB = getSpecificUser(email);
 		//TODO complete logic
+		
 		//update the user from the data-base and save the new user
 		this.userDao.save(this.userConverter.toEntity(userFromDB));
 	}
