@@ -1,5 +1,8 @@
 package com.example.demo.boundary;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class UserBoundary {
 	private String email;
 	private String password;
@@ -26,6 +29,8 @@ public class UserBoundary {
 		this.email = email;
 	}
 
+	@JsonIgnore
+	@JsonProperty(value = "password")
 	public String getPassword() {
 		return password;
 	}
