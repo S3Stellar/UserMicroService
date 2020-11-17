@@ -34,7 +34,7 @@ public class Validator {
 	}
 
 	public boolean validateUserBirthdate(String birthdate) {
-		// TODO fix validate user birthdate 
+		// TODO start 
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 		formatter.setLenient(false);
 		try {
