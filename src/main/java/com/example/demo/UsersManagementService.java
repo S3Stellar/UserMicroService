@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import java.util.List;
+
 import com.example.demo.boundary.UserBoundary;
 
 public interface UsersManagementService {
@@ -14,11 +16,11 @@ public interface UsersManagementService {
 
 	public void deleteAllUsers();
 
-	public UserBoundary[] searchByLastName(String value, int size, int page, String sortAttribute, String sortOrder);
+	public List<UserBoundary> searchByLastName(String value, int size, int page, String sortAttribute, String sortOrder);
 
-	public UserBoundary[] searchByMinimumAge(String value, int size, int page, String sortAttribute, String sortOrder);
+	public List<UserBoundary> searchByMinimumAge(String value, int size, int page, String sortAttribute, String sortOrder);
 
-	public UserBoundary[] searchByRole(String value, int size, int page, String sortAttribute, String sortOrder);
+	public List<UserBoundary> searchByRole(String value, int size, int page, String sortAttribute, String sortOrder);
 
-	public UserBoundary[] getAllUsers(int size, int page, String sortAttribute, String sortOrder);
+	public List<UserBoundary> getAllUsers(int size, int page, String sortAttribute, String sortOrder);
 }
