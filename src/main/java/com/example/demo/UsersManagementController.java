@@ -13,9 +13,7 @@ import com.example.demo.boundary.UserBoundary;
 @RestController
 public class UsersManagementController {
 	private UsersManagementService usersManagementService;
-	
-	//??
-	
+
 	@Autowired
 	public void setUsersManagementService(UsersManagementService usersManagementService) {
 		this.usersManagementService = usersManagementService;
@@ -67,7 +65,7 @@ public class UsersManagementController {
 			method = RequestMethod.GET,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public UserBoundary[] searchUsers (
-			@RequestParam(name = "criteriaType", required = false) String type,
+			@RequestParam(name = "criteriaType", required = false, defaultValue = "") String type,
 			@RequestParam(name = "criteriaValue", required = false) String value,
 			@RequestParam(name = "size", required = false, defaultValue = "10") int size,
 			@RequestParam(name = "page", required = false, defaultValue = "0") int page,
@@ -76,13 +74,13 @@ public class UsersManagementController {
 		
 		switch (type) {
 		case "byLastName":
-			return this.usersManagementService.searchByLastName(value, size, page, sortAttribute, sortOrder);
+			return this.usersManagementService.searchByLastName(value, size, page, sortAttribute, sortOrder).toArray(new UserBoundary[0]);
 		case "byMinimumAge":
-			return this.usersManagementService.searchByMinimumAge(value, size, page, sortAttribute, sortOrder);
+			return this.usersManagementService.searchByMinimumAge(value, size, page, sortAttribute, sortOrder).toArray(new UserBoundary[0]);
 		case "byRole":
-			return this.usersManagementService.searchByRole(value, size, page, sortAttribute, sortOrder);
+			return this.usersManagementService.searchByRole(value, size, page, sortAttribute, sortOrder).toArray(new UserBoundary[0]);
 		default:
-			return this.usersManagementService.getAllUsers(size, page, sortAttribute, sortOrder);
+			return this.usersManagementService.getAllUsers(size, page, sortAttribute, sortOrder).toArray(new UserBoundary[0]);
 
 		}	
 	}

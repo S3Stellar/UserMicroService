@@ -1,9 +1,13 @@
 package com.example.demo.data;
 
+import java.util.Date;
+
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.example.demo.boundary.Name;
 
@@ -13,10 +17,10 @@ public class UserEntity {
 	private String email;
 	private String password;
 	private Name name;
-	private String birthdate;
+	private Date birthdate;
 	private String[] roles;
 	
-	public UserEntity(String email, String password, Name name, String birthdate, String[] roles) {
+	public UserEntity(String email, String password, Name name, Date birthdate, String[] roles) {
 		this.email = email;
 		this.password = password;
 		this.name = name;
@@ -52,12 +56,13 @@ public class UserEntity {
 	public void setName(Name name) {
 		this.name = name;
 	}
-
-	public String getBirthdate() {
+	
+	@Temporal(TemporalType.DATE)
+	public Date getBirthdate() {
 		return birthdate;
 	}
 
-	public void setBirthdate(String birthdate) {
+	public void setBirthdate(Date birthdate) {
 		this.birthdate = birthdate;
 	}
 

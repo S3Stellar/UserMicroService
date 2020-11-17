@@ -1,8 +1,15 @@
-package com.example.demo.service;
+package com.example.demo.service;:
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.UsersManagementService;
@@ -10,12 +17,15 @@ import com.example.demo.boundary.UserBoundary;
 import com.example.demo.dal.UserDao;
 import com.example.demo.data.UserConverter;
 import com.example.demo.data.UserEntity;
+
 import com.example.demo.exceptions.BadFormatBirthdateException;
 import com.example.demo.exceptions.BadFormatEmailException;
 import com.example.demo.exceptions.BadFormatNameException;
 import com.example.demo.exceptions.BadFormatPasswordException;
 import com.example.demo.exceptions.BadFormatRoleException;
 import com.example.demo.exceptions.UserAlreadyExistsException;
+import com.example.demo.exceptions.BirthdateParseException;
+import com.example.demo.exceptions.IncorrectPasswordException;
 import com.example.demo.exceptions.UserNotFoundException;
 import com.example.demo.validation.Validator;
 
@@ -105,27 +115,73 @@ public class UsersManagementServiceWithDB implements UsersManagementService{
 	}
 
 	@Override
-	public UserBoundary[] searchByLastName(String value, int size, int page, String sortAttribute, String sortOrder) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<UserBoundary> searchByLastName(
+			String value, int size, int page,
+			String sortAttribute, String sortOrder) {
+		
+		Direction direction;
+		if(sortOrder.equals("ASC"))
+			direction = Direction.ASC;
+		else 
+			direction = Direction.DESC;
+		
+		return this.userDao.findAllByName_last
+				(value, PageRequest.of(page, size, direction, sortAttribute)).stream()
+		.map(this.userConverter::fromEntity)
+		.collect(Collectors.toList());
 	}
 
 	@Override
-	public UserBoundary[] searchByMinimumAge(String value, int size, int page, String sortAttribute, String sortOrder) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<UserBoundary> searchByMinimumAge(
+			String value, int size, int page,
+			String sortAttribute, String sortOrder) {
+		
+		Direction direction;
+		if(sortOrder.equals("ASC"))
+			direction = Direction.ASC;
+		else 
+			direction = Direction.DESC;
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+		Date parsedDate;
+		try {
+			parsedDate = dateFormat.parse(value);
+		} catch (ParseException e) {
+			throw new BirthdateParseException();
+		}
+		
+		return this.userDao.findAllByBirthdateGreaterThanEqual(
+				parsedDate, PageRequest.of(page, size, direction, sortAttribute)).stream()
+		.map(this.userConverter::fromEntity)
+		.collect(Collectors.toList());
 	}
 
 	@Override
-	public UserBoundary[] searchByRole(String value, int size, int page, String sortAttribute, String sortOrder) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<UserBoundary> searchByRole(String value, int size, int page, String sortAttribute, String sortOrder) {
+		Direction direction;
+		if(sortOrder.equals("ASC"))
+			direction = Direction.ASC;
+		else 
+			direction = Direction.DESC;
+		
+		return this.userDao.findAllByRoles(
+				value, PageRequest.of(page, size, direction, sortAttribute)).stream()
+		.map(this.userConverter::fromEntity)
+		.collect(Collectors.toList());
 	}
 
 	@Override
-	public UserBoundary[] getAllUsers(int size, int page, String sortAttribute, String sortOrder) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<UserBoundary> getAllUsers(int size, int page, String sortAttribute, String sortOrder) {
+		Direction direction;
+		if(sortOrder.equals("ASC"))
+			direction = Direction.ASC;
+		else 
+			direction = Direction.DESC;
+		
+		return this.userDao.findAll(
+				PageRequest.of(page, size, direction, sortAttribute)).stream()
+		.map(this.userConverter::fromEntity)
+		.collect(Collectors.toList());
 	}
 	
 }
