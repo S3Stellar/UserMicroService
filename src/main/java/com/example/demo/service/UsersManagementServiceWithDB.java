@@ -61,5 +61,29 @@ public class UsersManagementServiceWithDB implements UsersManagementService{
 	public void deleteAllUsers() {
 		this.userDao.deleteAll();
 	}
+
+	@Override
+	public UserBoundary[] searchByLastName(String value, int size, int page, String sortAttribute, String sortOrder) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UserBoundary[] searchByMinimumAge(String value, int size, int page, String sortAttribute, String sortOrder) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UserBoundary[] searchByRole(String value, int size, int page, String sortAttribute, String sortOrder) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UserBoundary[] getAllUsers(int size, int page, String sortAttribute, String sortOrder) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

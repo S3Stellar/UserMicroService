@@ -60,6 +60,29 @@ public class UsersManagementController {
 		this.usersManagementService.deleteAllUsers();
 	}
 	
-	
-	
+	@RequestMapping(
+			path = "/users/search",
+			method = RequestMethod.GET,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public UserBoundary[] searchUsers (
+			@RequestParam(name = "criteriaType", required = false) String type,
+			@RequestParam(name = "criteriaValue", required = false) String value,
+			@RequestParam(name = "size", required = false, defaultValue = "10") int size,
+			@RequestParam(name = "page", required = false, defaultValue = "0") int page,
+			@RequestParam(name = "sortBy", required = false, defaultValue = "email") String sortAttribute,
+			@RequestParam(name = "sortOrder", required = false, defaultValue = "ASC") String sortOrder){
+		
+		switch (type) {
+		case "byLastName":
+			return this.usersManagementService.searchByLastName(value, size, page, sortAttribute, sortOrder);
+		case "byMinimumAge":
+			return this.usersManagementService.searchByMinimumAge(value, size, page, sortAttribute, sortOrder);
+		case "byRole":
+			return this.usersManagementService.searchByRole(value, size, page, sortAttribute, sortOrder);
+		default:
+			return this.usersManagementService.getAllUsers(size, page, sortAttribute, sortOrder);
+
+		}	
+	}
+
 }

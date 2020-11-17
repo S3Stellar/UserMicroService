@@ -13,4 +13,12 @@ public interface UsersManagementService {
 	public void updateUser(String email, UserBoundary user);
 
 	public void deleteAllUsers();
+
+	public UserBoundary[] searchByLastName(String value, int size, int page, String sortAttribute, String sortOrder);
+
+	public UserBoundary[] searchByMinimumAge(String value, int size, int page, String sortAttribute, String sortOrder);
+
+	public UserBoundary[] searchByRole(String value, int size, int page, String sortAttribute, String sortOrder);
+
+	public UserBoundary[] getAllUsers(int size, int page, String sortAttribute, String sortOrder);
 }
