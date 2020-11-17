@@ -4,12 +4,18 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.example.demo.UsersManagementService;
 import com.example.demo.boundary.UserBoundary;
 import com.example.demo.dal.UserDao;
 import com.example.demo.data.UserConverter;
 import com.example.demo.data.UserEntity;
-import com.example.demo.exceptions.IncorrectPasswordException;
+import com.example.demo.exceptions.BadFormatBirthdateException;
+import com.example.demo.exceptions.BadFormatEmailException;
+import com.example.demo.exceptions.BadFormatNameException;
+import com.example.demo.exceptions.BadFormatPasswordException;
+import com.example.demo.exceptions.BadFormatRoleException;
+import com.example.demo.exceptions.UserAlreadyExistsException;
 import com.example.demo.exceptions.UserNotFoundException;
 import com.example.demo.validation.Validator;
 
@@ -38,10 +44,33 @@ public class UsersManagementServiceWithDB implements UsersManagementService{
 	
 	@Override
 	public UserBoundary create(UserBoundary user) {
-		if(!this.validator.validateUserPassword(user.getPassword())) {
-			throw new RuntimeException("Your password don't match to our criteria");
+		if(!this.validator.validateUserEmail(user.getEmail())) {
+			throw new BadFormatEmailException("Email must be example@example.com");
 		}
-		UserEntity userFromDB= this.userDao.save(this.userConverter.toEntity(user));
+		
+		if(!this.validator.validateUserPassword(user.getPassword())) {
+			throw new BadFormatPasswordException("Password must be 5 letters long and containts at least one digit");
+			
+		}
+		
+		if(!this.validator.validateUserBirthdate(user.getBirthdate())) {
+			throw new BadFormatBirthdateException("Birthdate must be in the format of dd-MM-yyyy");
+		}
+		
+		if(!this.validator.validateUserName(user.getName())) {
+			throw new BadFormatNameException("Name must not be empty or null");
+		}
+		
+		if(!this.validator.validateUserRole(user.getRoles())) {
+			throw new BadFormatRoleException("Role must not be empty or null");
+		}
+		
+		Optional<UserEntity> userEntity = this.userDao.findById(user.getEmail());
+		if(userEntity.isPresent())	{
+			throw new UserAlreadyExistsException("User already exists in the system");
+		}
+		
+		UserEntity userFromDB = this.userDao.save(this.userConverter.toEntity(user));
 		return this.userConverter.fromEntity(userFromDB);
 	}
 
@@ -58,7 +87,7 @@ public class UsersManagementServiceWithDB implements UsersManagementService{
 		UserBoundary userFromDB = getSpecificUser(email);
 		if(userFromDB.getPassword().equals(password))
 			return userFromDB;
-		throw new IncorrectPasswordException("incorrect password for email: "+email);
+		throw new BadFormatPasswordException("incorrect password for email: "+email);
 	}
 
 	@Override
