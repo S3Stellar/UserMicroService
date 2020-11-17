@@ -114,6 +114,34 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 
 	@Override
 	public void updateUser(String email, UserBoundary user) {
+		if (!this.validator.validateUserEmail(email)) {
+			throw new BadFormatEmailException("Email must be example@example.com");
+		}
+		UserEntity userEntity = this.userDao.
+				findById(email).
+				orElseThrow(()-> new UserNotFoundException("User not found"));
+		
+		if(user != null) {
+			
+			
+			if(this.validator.validateUserPassword(user.getPassword())) {
+				userEntity.setPassword(user.getPassword());
+			}
+			
+			if(this.validator.validateUserName(user.getName())) {
+				userEntity.setName(user.getName());
+			}
+			
+			if(this.validator.validateUserBirthdate(user.getBirthdate())) {
+				// TODO deprecated 
+				userEntity.setBirthdate(new Date(user.getBirthdate()));
+			}
+			
+			if(this.validator.validateUserRole(user.getRoles())) {
+				user.setRoles(user.getRoles());
+			}
+			
+		}
 		UserBoundary userFromDB = getSpecificUser(email);
 		// TODO complete logic
 
