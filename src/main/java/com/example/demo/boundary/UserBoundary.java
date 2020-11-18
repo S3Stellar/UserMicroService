@@ -1,5 +1,6 @@
 package com.example.demo.boundary;
 
+import com.example.demo.validation.Email;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -20,7 +21,8 @@ public class UserBoundary {
 	
 	public UserBoundary() {
 	}
-
+	
+	@Email
 	public String getEmail() {
 		return email;
 	}
