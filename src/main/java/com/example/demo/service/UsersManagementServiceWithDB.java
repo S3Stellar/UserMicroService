@@ -19,11 +19,11 @@ import com.example.demo.dal.UserDao;
 import com.example.demo.data.UserConverter;
 import com.example.demo.data.UserEntity;
 
-import com.example.demo.exceptions.BadFormatBirthdateException;
-import com.example.demo.exceptions.BadFormatEmailException;
-import com.example.demo.exceptions.BadFormatNameException;
-import com.example.demo.exceptions.BadFormatPasswordException;
-import com.example.demo.exceptions.BadFormatRoleException;
+import com.example.demo.exceptions.InvalidBirthdateException;
+import com.example.demo.exceptions.InvalidEmailException;
+import com.example.demo.exceptions.InvalidNameException;
+import com.example.demo.exceptions.InvalidPasswordException;
+import com.example.demo.exceptions.InvalidRoleException;
 import com.example.demo.exceptions.UserAlreadyExistsException;
 import com.example.demo.exceptions.BirthdateParseException;
 import com.example.demo.exceptions.UserNotFoundException;
@@ -54,24 +54,23 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 	@Transactional
 	public UserBoundary create(UserBoundary user) {
 		if (!this.validator.validateUserEmail(user.getEmail())) {
-			throw new BadFormatEmailException("Email must be in the format of example@example.com");
+			throw new InvalidEmailException("Email must be in the format of example@example.com");
 		}
 
 		if (!this.validator.validateUserPassword(user.getPassword())) {
-			throw new BadFormatPasswordException("Password must be 5 letters long and containts at least one digit");
-
+			throw new InvalidPasswordException("Password must be 5 letters long and containts at least one digit");
 		}
 
 		if (!this.validator.validateUserBirthdate(user.getBirthdate())) {
-			throw new BadFormatBirthdateException("Birthdate must be in the format of dd-MM-yyyy");
+			throw new InvalidBirthdateException("Birthdate must be in the format of dd-MM-yyyy");
 		}
 
 		if (!this.validator.validateUserName(user.getName())) {
-			throw new BadFormatNameException("Name must not be empty or null");
+			throw new InvalidNameException("Name must not be empty or null");
 		}
 
 		if (!this.validator.validateUserRole(user.getRoles())) {
-			throw new BadFormatRoleException("Role must not be empty or null");
+			throw new InvalidRoleException("Role must not be empty or null");
 		}
 
 		Optional<UserEntity> userEntity = this.userDao.findById(user.getEmail());
@@ -87,7 +86,7 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 	@Transactional(readOnly = true)
 	public UserBoundary getSpecificUser(String email) {
 		if (!this.validator.validateUserEmail(email)) {
-			throw new BadFormatEmailException("Email must be example@example.com");
+			throw new InvalidEmailException("Email must be example@example.com");
 		}
 
 		Optional<UserEntity> userFromDB = this.userDao.findById(email);
@@ -100,10 +99,10 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 	@Transactional(readOnly = true)
 	public UserBoundary login(String email, String password) {
 		if (!this.validator.validateUserEmail(email)) {
-			throw new BadFormatEmailException("Email must be example@example.com");
+			throw new InvalidEmailException("Email must be example@example.com");
 		}
 		if (!this.validator.validateUserPassword(password)) {
-			throw new BadFormatPasswordException("Password must be 5 letters long and containts at least one digit");
+			throw new InvalidPasswordException("Password must be 5 letters long and containts at least one digit");
 		}
 
 		UserEntity userFromDB = this.userDao.findById(email)
@@ -112,7 +111,7 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 		if (userFromDB.getPassword().equals(password))
 			return this.userConverter.fromEntity(userFromDB);
 
-		throw new BadFormatPasswordException("incorrect password for email: " + email);
+		throw new InvalidPasswordException("incorrect password for email: " + email);
 	}
 
 	@Override
@@ -131,17 +130,14 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 			}
 
 			if (this.validator.validateUserBirthdate(user.getBirthdate())) {
-				// TODO deprecated
 				existing.setBirthdate(user.getBirthdate());
 			}
 
 			if (this.validator.validateUserRole(user.getRoles())) {
 				existing.setRoles(user.getRoles());
 			}
-
 		}
 		
-		// update the user from the data-base and save the new user
 		this.userDao.save(this.userConverter.toEntity(existing));
 	}
 

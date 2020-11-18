@@ -4,24 +4,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-public class BadFormatEmailException extends RuntimeException {
+public class InvalidNameException extends RuntimeException {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 2931035493302549190L;
+	private static final long serialVersionUID = 4048122430492015121L;
 
-	public BadFormatEmailException() {
+	public InvalidNameException() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public BadFormatEmailException(String message) {
+	public InvalidNameException(String message) {
 		super(message);
 		// TODO Auto-generated constructor stub
 	}
 
 	
 	
-		
 }

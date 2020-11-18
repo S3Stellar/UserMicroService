@@ -12,8 +12,7 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.constraints.Pattern;
 
-@Pattern(regexp = ".+@.+\\..+")
-@Constraint(validatedBy = {})
+@Constraint(validatedBy = EmailValidation.class)
 @Target({ METHOD, FIELD, ANNOTATION_TYPE })
 @Retention(RUNTIME)
 

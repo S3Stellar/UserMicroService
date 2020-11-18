@@ -21,7 +21,12 @@ public class Validator {
 		if (userEmail == null || userEmail.isEmpty()) {
 			return false;
 		}
-		Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
+		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+ 
+                "[a-zA-Z0-9_+&*-]+)*@" + 
+                "(?:[a-zA-Z0-9-]+\\.)+[a-z" + 
+                "A-Z]{2,7}$"; 
+		
+		Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile(emailRegex,
 				Pattern.CASE_INSENSITIVE);
 		Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(userEmail);
 		return matcher.matches();
@@ -39,11 +44,11 @@ public class Validator {
 	}
 
 	public boolean validateUserBirthdate(String birthdate) {
-		// TODO
-		String lastFourDigits = birthdate.substring(birthdate.length() - 4);
+		
+		String yearDigits = birthdate.substring(birthdate.length() - ((int)Math.log10(LocalDate.now().getYear()) + 1));
 		int year;
 		try {
-			year = Integer.parseInt(lastFourDigits);
+			year = Integer.parseInt(yearDigits);
 			if (year > LocalDate.now().getYear()) {
 				throw new RuntimeException("Year is not valid");
 			}
