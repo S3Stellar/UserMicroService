@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.UsersManagementService;
 import com.example.demo.boundary.UserBoundary;
@@ -33,6 +32,7 @@ import com.example.demo.validation.Validator;
 public class UsersManagementServiceWithDB implements UsersManagementService {
 	private UserDao userDao;
 	private UserConverter userConverter;
+
 	private Validator validator;
 
 	@Autowired
@@ -51,10 +51,9 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 	}
 
 	@Override
-	@Transactional
 	public UserBoundary create(UserBoundary user) {
 		if (!this.validator.validateUserEmail(user.getEmail())) {
-			throw new BadFormatEmailException("Email must be in the format of example@example.com");
+			throw new BadFormatEmailException("Email must be example@example.com");
 		}
 
 		if (!this.validator.validateUserPassword(user.getPassword())) {
@@ -84,7 +83,6 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public UserBoundary getSpecificUser(String email) {
 		if (!this.validator.validateUserEmail(email)) {
 			throw new BadFormatEmailException("Email must be example@example.com");
@@ -97,7 +95,6 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public UserBoundary login(String email, String password) {
 		if (!this.validator.validateUserEmail(email)) {
 			throw new BadFormatEmailException("Email must be example@example.com");
@@ -105,10 +102,10 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 		if (!this.validator.validateUserPassword(password)) {
 			throw new BadFormatPasswordException("Password must be 5 letters long and containts at least one digit");
 		}
-
-		UserEntity userFromDB = this.userDao.findById(email)
-				.orElseThrow(() -> new UserNotFoundException("The correspond user isn't found"));
-
+		
+		UserEntity userFromDB = this.userDao.findById(email).
+				orElseThrow(()-> new UserNotFoundException("The correspond user isn't found") );
+		
 		if (userFromDB.getPassword().equals(password))
 			return this.userConverter.fromEntity(userFromDB);
 
@@ -116,43 +113,48 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 	}
 
 	@Override
-	@Transactional
 	public void updateUser(String email, UserBoundary user) {
-		UserBoundary existing = getSpecificUser(email);
-
-		if (user != null) {
-
-			if (this.validator.validateUserPassword(user.getPassword())) {
-				existing.setPassword(user.getPassword());
-			}
-
-			if (this.validator.validateUserName(user.getName())) {
-				existing.setName(user.getName());
-			}
-
-			if (this.validator.validateUserBirthdate(user.getBirthdate())) {
-				// TODO deprecated
-				existing.setBirthdate(user.getBirthdate());
-			}
-
-			if (this.validator.validateUserRole(user.getRoles())) {
-				existing.setRoles(user.getRoles());
-			}
-
+		if (!this.validator.validateUserEmail(email)) {
+			throw new BadFormatEmailException("Email must be example@example.com");
 		}
+		UserEntity userEntity = this.userDao.
+				findById(email).
+				orElseThrow(()-> new UserNotFoundException("User not found"));
 		
+		if(user != null) {
+			
+			
+			if(this.validator.validateUserPassword(user.getPassword())) {
+				userEntity.setPassword(user.getPassword());
+			}
+			
+			if(this.validator.validateUserName(user.getName())) {
+				userEntity.setName(user.getName());
+			}
+			
+			if(this.validator.validateUserBirthdate(user.getBirthdate())) {
+				// TODO deprecated 
+				userEntity.setBirthdate(new Date(user.getBirthdate()));
+			}
+			
+			if(this.validator.validateUserRole(user.getRoles())) {
+				user.setRoles(user.getRoles());
+			}
+			
+		}
+		UserBoundary userFromDB = getSpecificUser(email);
+		// TODO complete logic
+
 		// update the user from the data-base and save the new user
-		this.userDao.save(this.userConverter.toEntity(existing));
+		this.userDao.save(this.userConverter.toEntity(userFromDB));
 	}
 
 	@Override
-	@Transactional
 	public void deleteAllUsers() {
 		this.userDao.deleteAll();
 	}
 
 	@Override
-	@Transactional
 	public List<UserBoundary> searchByLastName(String value, int size, int page, String sortAttribute,
 			String sortOrder) {
 
@@ -167,7 +169,6 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 	}
 
 	@Override
-	@Transactional
 	public List<UserBoundary> searchByMinimumAge(String value, int size, int page, String sortAttribute,
 			String sortOrder) {
 
@@ -191,7 +192,6 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 	}
 
 	@Override
-	@Transactional
 	public List<UserBoundary> searchByRole(String value, int size, int page, String sortAttribute, String sortOrder) {
 		Direction direction;
 		if (sortOrder.equals("ASC"))
@@ -204,7 +204,6 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 	}
 
 	@Override
-	@Transactional
 	public List<UserBoundary> getAllUsers(int size, int page, String sortAttribute, String sortOrder) {
 		Direction direction;
 		if (sortOrder.equals("ASC"))
