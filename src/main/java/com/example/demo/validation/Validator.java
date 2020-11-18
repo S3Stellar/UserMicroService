@@ -1,16 +1,21 @@
 package com.example.demo.validation;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.InputMismatchException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.hibernate.query.internal.BindingTypeHelper;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.boundary.Name;
 
 @Component
 public class Validator {
+	private final static int DEFAULT_PASSWORD_LEN = 5;
 
 	public boolean validateUserEmail(String userEmail) {
 		if (userEmail == null || userEmail.isEmpty()) {
@@ -23,7 +28,7 @@ public class Validator {
 	}
 
 	public boolean validateUserPassword(String password) {
-		if (password == null || password.length() < 5) {
+		if (password == null || password.length() < DEFAULT_PASSWORD_LEN) {
 			return false;
 		}
 		return Pattern.compile("[0-9]+").matcher(password).find();
@@ -34,25 +39,29 @@ public class Validator {
 	}
 
 	public boolean validateUserBirthdate(String birthdate) {
-		// TODO start 
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-		formatter.setLenient(false);
+		// TODO
+		String lastFourDigits = birthdate.substring(birthdate.length() - 4);
+		int year;
 		try {
-			formatter.parse(birthdate);
+			year = Integer.parseInt(lastFourDigits);
+			if (year > LocalDate.now().getYear()) {
+				throw new RuntimeException("Year is not valid");
+			}
+			DateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+			sdf.setLenient(false);
+			sdf.parse(birthdate);
 
-		} catch (ParseException e) {
+		} catch (NumberFormatException | ParseException e) {
 			return false;
 		}
 		return true;
 	}
 
 	public boolean validateUserRole(String[] roles) {
-	
 		if (roles != null) {
 			for (String role : roles)
-				if (role == null || role.isEmpty()) {
+				if (role == null || role.isEmpty())
 					return false;
-				}
 		}
 		return true;
 	}
