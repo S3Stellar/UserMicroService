@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -13,19 +15,17 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.UsersManagementService;
 import com.example.demo.boundary.UserBoundary;
 import com.example.demo.dal.UserDao;
 import com.example.demo.data.UserConverter;
 import com.example.demo.data.UserEntity;
-
+import com.example.demo.exceptions.BirthdateParseException;
 import com.example.demo.exceptions.InvalidBirthdateException;
 import com.example.demo.exceptions.InvalidEmailException;
 import com.example.demo.exceptions.InvalidNameException;
 import com.example.demo.exceptions.InvalidPasswordException;
 import com.example.demo.exceptions.InvalidRoleException;
 import com.example.demo.exceptions.UserAlreadyExistsException;
-import com.example.demo.exceptions.BirthdateParseException;
 import com.example.demo.exceptions.UserNotFoundException;
 import com.example.demo.validation.Validator;
 
@@ -137,7 +137,7 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 				existing.setRoles(user.getRoles());
 			}
 		}
-		
+
 		this.userDao.save(this.userConverter.toEntity(existing));
 	}
 
@@ -152,11 +152,7 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 	public List<UserBoundary> searchByLastName(String value, int size, int page, String sortAttribute,
 			String sortOrder) {
 
-		Direction direction;
-		if (sortOrder.equals("ASC"))
-			direction = Direction.ASC;
-		else
-			direction = Direction.DESC;
+		Direction direction = sortOrder.equals(Direction.ASC.toString()) ? Direction.ASC : Direction.DESC;
 
 		return this.userDao.findAllByName_last(value, PageRequest.of(page, size, direction, sortAttribute)).stream()
 				.map(this.userConverter::fromEntity).collect(Collectors.toList());
@@ -166,35 +162,27 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 	@Transactional
 	public List<UserBoundary> searchByMinimumAge(String value, int size, int page, String sortAttribute,
 			String sortOrder) {
+		Direction direction = sortOrder.equals(Direction.ASC.toString()) ? Direction.ASC : Direction.DESC;
 
-		Direction direction;
-		if (sortOrder.equals("ASC"))
-			direction = Direction.ASC;
-		else
-			direction = Direction.DESC;
+		String dateMinusYears = LocalDate.now().minusYears(Integer.parseInt(value))
+				.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-		Date parsedDate;
+		Date date = null;
 		try {
-			parsedDate = dateFormat.parse(value);
+			date = new SimpleDateFormat("dd-MM-yyyy").parse(dateMinusYears);
 		} catch (ParseException e) {
-			throw new BirthdateParseException();
+			throw new BirthdateParseException(e.getMessage());
 		}
 
 		return this.userDao
-				.findAllByBirthdateGreaterThanEqual(parsedDate, PageRequest.of(page, size, direction, sortAttribute))
-				.stream().map(this.userConverter::fromEntity).collect(Collectors.toList());
+				.findAllByBirthdateLessThanEqual(date, PageRequest.of(page, size, direction, sortAttribute)).stream()
+				.map(this.userConverter::fromEntity).collect(Collectors.toList());
 	}
 
 	@Override
 	@Transactional
 	public List<UserBoundary> searchByRole(String value, int size, int page, String sortAttribute, String sortOrder) {
-		Direction direction;
-		if (sortOrder.equals("ASC"))
-			direction = Direction.ASC;
-		else
-			direction = Direction.DESC;
-
+		Direction direction = sortOrder.equals(Direction.ASC.toString()) ? Direction.ASC : Direction.DESC;
 		return this.userDao.findAllByRoles(value, PageRequest.of(page, size, direction, sortAttribute)).stream()
 				.map(this.userConverter::fromEntity).collect(Collectors.toList());
 	}
@@ -202,12 +190,7 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 	@Override
 	@Transactional
 	public List<UserBoundary> getAllUsers(int size, int page, String sortAttribute, String sortOrder) {
-		Direction direction;
-		if (sortOrder.equals("ASC"))
-			direction = Direction.ASC;
-		else
-			direction = Direction.DESC;
-
+		Direction direction = sortOrder.equals(Direction.ASC.toString()) ? Direction.ASC : Direction.DESC;
 		return this.userDao.findAll(PageRequest.of(page, size, direction, sortAttribute)).stream()
 				.map(this.userConverter::fromEntity).collect(Collectors.toList());
 	}

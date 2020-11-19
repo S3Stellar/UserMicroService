@@ -4,11 +4,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.InputMismatchException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.hibernate.query.internal.BindingTypeHelper;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.boundary.Name;
@@ -44,7 +42,7 @@ public class Validator {
 	}
 
 	public boolean validateUserBirthdate(String birthdate) {
-		
+		// TODO write more clean code
 		String yearDigits = birthdate.substring(birthdate.length() - ((int)Math.log10(LocalDate.now().getYear()) + 1));
 		int year;
 		try {

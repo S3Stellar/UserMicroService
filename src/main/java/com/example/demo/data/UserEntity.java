@@ -1,17 +1,15 @@
 package com.example.demo.data;
 
 import java.util.Date;
+import java.util.List;
 
-import javax.persistence.Convert;
+import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.example.demo.boundary.Name;
 
 @Entity
 @Table(name = "USERS")
@@ -21,9 +19,9 @@ public class UserEntity {
 	private String password;
 	private Name name;
 	private Date birthdate;
-	private String[] roles;
+	private List<String> roles;
 	
-	public UserEntity(String email, String password, Name name, Date birthdate, String[] roles) {
+	public UserEntity(String email, String password, Name name, Date birthdate, List<String> roles) {
 		this.email = email;
 		this.password = password;
 		this.name = name;
@@ -69,13 +67,12 @@ public class UserEntity {
 		this.birthdate = birthdate;
 	}
 
-	@Lob
-	@Convert(converter = RoleConverter.class)
-	public String[] getRoles() {
+	@ElementCollection
+	public List<String> getRoles() {
 		return roles;
 	}
 	
-	public void setRoles(String[] roles) {
+	public void setRoles(List<String> roles) {
 		this.roles = roles;
 	}
 }

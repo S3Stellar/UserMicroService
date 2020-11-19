@@ -1,17 +1,20 @@
-package com.example.demo.boundary;
+package com.example.demo.data;
 
+import javax.persistence.Embeddable;
+
+@Embeddable
 public class Name {
 	private String first;
 	private String last;
-
+	
 	public Name(String first, String last) {
 		this.first = first;
 		this.last = last;
 	}
-
+	
 	public Name() {
 	}
-
+	
 	public String getFirst() {
 		return first;
 	}
@@ -27,5 +30,6 @@ public class Name {
 	public void setLast(String last) {
 		this.last = last;
 	}
-
+	
+	
 }

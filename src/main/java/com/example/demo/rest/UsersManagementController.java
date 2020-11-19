@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.example.demo.boundary.UserBoundary;
+import com.example.demo.service.UsersManagementService;
+import com.example.demo.utility.*;
 
 @RestController
 public class UsersManagementController {
@@ -73,11 +76,11 @@ public class UsersManagementController {
 			@RequestParam(name = "sortOrder", required = false, defaultValue = "ASC") String sortOrder){
 		
 		switch (type) {
-		case "byLastName":
+		case ControllerTypes.BY_LAST_NAME:
 			return this.usersManagementService.searchByLastName(value, size, page, sortAttribute, sortOrder).toArray(new UserBoundary[0]);
-		case "byMinimumAge":
+		case ControllerTypes.BY_MINIMUM_AGE:
 			return this.usersManagementService.searchByMinimumAge(value, size, page, sortAttribute, sortOrder).toArray(new UserBoundary[0]);
-		case "byRole":
+		case ControllerTypes.BY_ROLE:
 			return this.usersManagementService.searchByRole(value, size, page, sortAttribute, sortOrder).toArray(new UserBoundary[0]);
 		default:
 			return this.usersManagementService.getAllUsers(size, page, sortAttribute, sortOrder).toArray(new UserBoundary[0]);
