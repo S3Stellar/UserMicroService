@@ -1,9 +1,9 @@
 package com.example.demo.validation;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,22 +38,22 @@ public class Validator {
 	}
 
 	public boolean validateUserName(Name name) {
-		return name != null && !name.getFirst().isEmpty() && !name.getLast().isEmpty();
+		return name != null 
+				&& name.getFirst() != null 
+				&& name.getLast() != null 
+				&& !name.getFirst().isEmpty() 
+				&& !name.getLast().isEmpty();
 	}
 
 	public boolean validateUserBirthdate(String birthdate) {
-		// TODO write more clean code
-		String yearDigits = birthdate.substring(birthdate.length() - ((int)Math.log10(LocalDate.now().getYear()) + 1));
-		int year;
 		try {
-			year = Integer.parseInt(yearDigits);
-			if (year > LocalDate.now().getYear()) {
-				throw new RuntimeException("Year is not valid");
-			}
-			DateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 			sdf.setLenient(false);
-			sdf.parse(birthdate);
-
+			Date date = sdf.parse(birthdate);
+			if(new Date().before(date)) {
+				throw new RuntimeException("Invalid date");
+			}
+			
 		} catch (NumberFormatException | ParseException e) {
 			return false;
 		}

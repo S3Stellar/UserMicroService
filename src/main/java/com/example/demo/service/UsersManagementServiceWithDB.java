@@ -121,19 +121,24 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 
 		if (user != null) {
 
-			if (this.validator.validateUserPassword(user.getPassword())) {
+			if (user.getPassword() != null && this.validator.validateUserPassword(user.getPassword())) {
 				existing.setPassword(user.getPassword());
 			}
 
-			if (this.validator.validateUserName(user.getName())) {
-				existing.setName(user.getName());
+			if (user.getName() != null) {
+				if (user.getName().getFirst() != null) {
+					existing.getName().setFirst(user.getName().getFirst());
+				}
+				if (user.getName().getLast() != null) {
+					existing.getName().setLast(user.getName().getLast());
+				}
 			}
 
-			if (this.validator.validateUserBirthdate(user.getBirthdate())) {
+			if (user.getBirthdate() != null && this.validator.validateUserBirthdate(user.getBirthdate())) {
 				existing.setBirthdate(user.getBirthdate());
 			}
 
-			if (this.validator.validateUserRole(user.getRoles())) {
+			if (user.getRoles() != null && this.validator.validateUserRole(user.getRoles())) {
 				existing.setRoles(user.getRoles());
 			}
 		}
@@ -174,9 +179,8 @@ public class UsersManagementServiceWithDB implements UsersManagementService {
 			throw new BirthdateParseException(e.getMessage());
 		}
 
-		return this.userDao
-				.findAllByBirthdateLessThanEqual(date, PageRequest.of(page, size, direction, sortAttribute)).stream()
-				.map(this.userConverter::fromEntity).collect(Collectors.toList());
+		return this.userDao.findAllByBirthdateLessThanEqual(date, PageRequest.of(page, size, direction, sortAttribute))
+				.stream().map(this.userConverter::fromEntity).collect(Collectors.toList());
 	}
 
 	@Override
